@@ -1,7 +1,6 @@
 package ru.ifmo.collections;
 
-import java.util.AbstractSet;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * Represents sorted set of unique values.
@@ -16,21 +15,71 @@ import java.util.Comparator;
  *
  * @param <T> set contents type
  */
-public abstract class SortedSet<T> extends AbstractSet<T> {
-    // private final Map<???, ???> contents; TODO decide Map implementation and key/value types. "???" is used just as an example
+public class SortedSet<T> extends AbstractSet<T> {
+    private final TreeMap<T, Object> contents;
+
     public static <T> SortedSet<T> create() {
-        throw new UnsupportedOperationException(); // TODO implement
+        return new SortedSet<>();
     }
 
     public static <T> SortedSet<T> from(Comparator<T> comparator) {
-        throw new UnsupportedOperationException(); // TODO implement
+        return new SortedSet<>(comparator);
     }
 
-    public T[] getSorted() {
-        throw new UnsupportedOperationException(); // TODO implement
+    public SortedSet(Comparator<T> comparator) {
+        contents = new TreeMap<>(comparator);
     }
 
-    public T[] getReversed() {
-        throw new UnsupportedOperationException(); // TODO implement
+    public SortedSet() {
+        contents = new TreeMap<>();
+    }
+
+    @Override
+    public boolean add(T t) {
+        return contents.put(t, true) == null;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        if (o == null) {
+            throw new IllegalArgumentException("Argument is null");
+        }
+        return contents.remove(o) == null;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        boolean added = false;
+        for (T value : c) {
+            added |= add(value);
+        }
+        return added;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean removed = false;
+        for (var value : c) {
+            removed |= contents.remove(value) != null;
+        }
+        return removed;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return contents.keySet().iterator();
+    }
+
+    @Override
+    public int size() {
+        return contents.keySet().size();
+    }
+
+    public List<T> getSorted() {
+        return new ArrayList<>(contents.keySet());
+    }
+
+    public List<T> getReversed() {
+        return new ArrayList<>(contents.descendingKeySet());
     }
 }
